@@ -1,0 +1,13 @@
+# Pinned from the resolved working environment (Python 3.12, Windows, Aug 2026).
+# econml drives the numpy/scipy/scikit-learn choices: install order of debugging
+# was "let pip resolve around econml==0.17.0, then freeze the solution here".
+numpy==2.5.2
+pandas==2.2.3
+scipy==1.18.1
+scikit-learn==1.9.0
+statsmodels==0.14.4
+matplotlib==3.9.2
+econml==0.17.0
+lightgbm==4.7.0
+shap==0.52.0
+ipykernel==6.29.5
