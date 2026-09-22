@@ -159,3 +159,26 @@ def ate_table(df: pd.DataFrame, control_arm: str = "No E-Mail",
         rows.append(ate_continuous(df, "spend", arm, control_arm, arm_col))
     out = pd.DataFrame(rows).set_index(["treat_arm", "outcome"])
     return out.round(5)
+
+
+# ---------------------------------------------------------------------------
+# 4. Pre-registered subgroup ATEs (Day 2)
+# ---------------------------------------------------------------------------
+def subgroup_ates(df: pd.DataFrame, outcome: str, treat_arm: str, control_arm: str,
+                  by: str, arm_col: str = "segment") -> pd.DataFrame:
+    """Difference-in-means ATE with 95% CI inside each level of one covariate.
+
+    Valid because randomization holds within any PRE-TREATMENT slice: each
+    subgroup is its own smaller randomized experiment. Caveat handled in the
+    notebook: many subgroups => multiple comparisons; treat this as
+    hypothesis-generating unless pre-registered and corrected.
+    """
+    rows = []
+    levels = (df[by].cat.categories if hasattr(df[by], "cat") else sorted(df[by].unique()))
+    for level in levels:
+        sub = df[df[by] == level]
+        res = ate_binary(sub, outcome, treat_arm, control_arm, arm_col)
+        res.update({"subgroup": f"{by}={level}", "n": len(sub)})
+        rows.append(res)
+    return pd.DataFrame(rows).set_index("subgroup")[
+        ["n", "mean_treat", "mean_control", "ate", "ci_low", "ci_high", "p_value"]]
